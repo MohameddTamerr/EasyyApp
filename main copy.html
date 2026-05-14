@@ -736,6 +736,7 @@
     let answers       = {};
     let logoDataUrl   = "";
     let submittedCount = 0;
+    let isSubmitting  = false;
 
     /* ─── SVG ICONS ─── */
     const I = (d) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">${d}</svg>`;
@@ -790,6 +791,11 @@
         progress: "Progress",
         errorRequired: "Please answer this question before continuing.",
         errorForm: "Please fill all required fields before continuing.",
+        invalidName: "Please enter a valid name or company name.",
+        invalidEmail: "Please enter a valid email address.",
+        invalidPhone: "Please enter a valid phone number.",
+        invalidUrl: "Please enter a valid website or link.",
+        invalidColors: "Please enter valid hex colors in all brand color fields.",
         resultTitle: "Review Your Project Brief",
         resultDesc: "Check the summary below. Submit it directly, print it, or edit your answers. If you edit and submit again, the updated version will be sent.",
         submitBtn:   `${icons.mail} Submit Brief`,
@@ -800,7 +806,7 @@
         noAnswer:    "Not answered",
         uploadLogo:  "Upload logo file",
         noLogo:      "No logo selected",
-        color1: "Primary", color2: "Secondary", color3: "Dark Navy", color4: "Accent Blue", color5: "Light Background",
+        color1: "Primary brand color", color2: "Secondary brand color", color3: "Accent color", color4: "Dark text / UI color", color5: "Light background color",
         customOther: "Please explain your other choice",
         submitSuccess: "Submitted successfully. Thank you.",
         submitError:   "Submission failed. Please check your mail server or internet connection.",
@@ -853,6 +859,25 @@
         thanksEmailLine: "تم إرسال رسالة تأكيد تتضمن تفاصيل الإرسال إلى بريدك الإلكتروني.",
         viewSummaryBtn: "عرض الملخص"
       }
+    };
+
+    Object.assign(translations.ar, {
+      invalidName: "\u0645\u0646 \u0641\u0636\u0644\u0643 \u0623\u062f\u062e\u0644 \u0627\u0633\u0645\u064b\u0627 \u0635\u062d\u064a\u062d\u064b\u0627 \u0623\u0648 \u0627\u0633\u0645 \u0627\u0644\u0634\u0631\u0643\u0629.",
+      invalidEmail: "\u0645\u0646 \u0641\u0636\u0644\u0643 \u0623\u062f\u062e\u0644 \u0628\u0631\u064a\u062f\u064b\u0627 \u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a\u064b\u0627 \u0635\u062d\u064a\u062d\u064b\u0627.",
+      invalidPhone: "\u0645\u0646 \u0641\u0636\u0644\u0643 \u0623\u062f\u062e\u0644 \u0631\u0642\u0645 \u0647\u0627\u062a\u0641 \u0635\u062d\u064a\u062d.",
+      invalidUrl: "\u0645\u0646 \u0641\u0636\u0644\u0643 \u0623\u062f\u062e\u0644 \u0631\u0627\u0628\u0637\u064b\u0627 \u0623\u0648 \u0645\u0648\u0642\u0639\u064b\u0627 \u0635\u062d\u064a\u062d\u064b\u0627.",
+      invalidColors: "\u0645\u0646 \u0641\u0636\u0644\u0643 \u0623\u062f\u062e\u0644 \u0623\u0644\u0648\u0627\u0646 Hex \u0635\u062d\u064a\u062d\u0629 \u0641\u064a \u062c\u0645\u064a\u0639 \u062d\u0642\u0648\u0644 \u0627\u0644\u0623\u0644\u0648\u0627\u0646.",
+      color1: "\u0627\u0644\u0644\u0648\u0646 \u0627\u0644\u0623\u0633\u0627\u0633\u064a",
+      color2: "\u0627\u0644\u0644\u0648\u0646 \u0627\u0644\u062b\u0627\u0646\u0648\u064a",
+      color3: "\u0644\u0648\u0646 \u062a\u0645\u064a\u064a\u0632",
+      color4: "\u0644\u0648\u0646 \u062f\u0627\u0643\u0646 \u0644\u0644\u0646\u0635 \u0648\u0627\u0644\u0648\u0627\u062c\u0647\u0629",
+      color5: "\u0644\u0648\u0646 \u062e\u0644\u0641\u064a\u0629 \u0641\u0627\u062a\u062d"
+    });
+
+    const DEFAULT_BRAND_COLORS = ["#0b7ff3", "#12a8ff", "#0b4fd8", "#102a63", "#f4f9fd"];
+    const EXCLUSIVE_MULTI_OPTIONS = {
+      brandAvailability: "I need help creating the brand assets",
+      preparedAssets: "Need Help Preparing Everything"
     };
 
     /* ─── QUESTIONS ─── */
@@ -1157,18 +1182,68 @@
       });
     }
 
+    function getMultiAnswer(id) {
+      return Array.isArray(answers[id]) ? answers[id] : [];
+    }
+
+    function isExclusiveMultiOption(questionId, optionValue) {
+      return EXCLUSIVE_MULTI_OPTIONS[questionId] === optionValue;
+    }
+
+    function hasSelectedLogo() {
+      return getMultiAnswer("brandAvailability").includes("I have a logo");
+    }
+
+    function hasSelectedBrandColors() {
+      return getMultiAnswer("brandAvailability").includes("I have brand colors");
+    }
+
+    function getEffectiveLogoStatus() {
+      return hasSelectedLogo() ? String(answers.logoStatus || "").trim() : "";
+    }
+
+    function getEffectiveColors() {
+      return hasSelectedBrandColors() && Array.isArray(answers.colors) ? answers.colors : [];
+    }
+
+    function isValidNameValue(value) {
+      return String(value || "").trim().length >= 2;
+    }
+
+    function isValidEmailValue(value) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || "").trim());
+    }
+
+    function isValidPhoneValue(value) {
+      const normalized = String(value || "").trim();
+      const digitsOnly = normalized.replace(/\D/g, "");
+      return /^[\d\s()+-]+$/.test(normalized) && digitsOnly.length >= 7 && digitsOnly.length <= 15;
+    }
+
+    function isValidUrlValue(value) {
+      const normalized = String(value || "").trim();
+      if (!normalized) return true;
+      try {
+        const parsed = new URL(/^https?:\/\//i.test(normalized) ? normalized : `https://${normalized}`);
+        return Boolean(parsed.hostname && parsed.hostname.includes("."));
+      } catch {
+        return false;
+      }
+    }
+
     function renderAssetsQ() {
       const grid = document.getElementById("optionsGrid");
       const form = document.getElementById("formArea");
       grid.classList.add("hidden");
       form.classList.remove("hidden");
 
-      const sel        = answers.brandAvailability || [];
+      const sel        = getMultiAnswer("brandAvailability");
       const needsLogo  = sel.includes("I have a logo");
       const needsColor = sel.includes("I have brand colors");
 
-      if (!answers.logoStatus) answers.logoStatus = needsLogo ? "" : "No logo available";
-      if (!answers.colors)     answers.colors     = ["#0b7ff3","#12a8ff","#061b5b","#0b4fd8","#f0f8ff"];
+      if (!Array.isArray(answers.colors) || answers.colors.length !== DEFAULT_BRAND_COLORS.length) {
+        answers.colors = [...DEFAULT_BRAND_COLORS];
+      }
 
       const colorNames = [
         translations[currentLang].color1, translations[currentLang].color2,
@@ -1226,7 +1301,9 @@
     }
 
     function updateColor(i, val) {
-      if (!answers.colors) answers.colors = ["#0b7ff3","#12a8ff","#061b5b","#0b4fd8","#f0f8ff"];
+      if (!Array.isArray(answers.colors) || answers.colors.length !== DEFAULT_BRAND_COLORS.length) {
+        answers.colors = [...DEFAULT_BRAND_COLORS];
+      }
       answers.colors[i] = val || "#000000";
       renderAssetsQ();
     }
@@ -1235,11 +1312,15 @@
       if (q.type === "single") {
         answers[q.id] = opt.en;
       } else {
-        if (!Array.isArray(answers[q.id])) answers[q.id] = [];
-        const idx = answers[q.id].indexOf(opt.en);
-        answers[q.id] = idx > -1
-          ? answers[q.id].filter(x => x !== opt.en)
-          : [...answers[q.id], opt.en];
+        const current = getMultiAnswer(q.id);
+        const idx = current.indexOf(opt.en);
+        if (idx > -1) {
+          answers[q.id] = current.filter(x => x !== opt.en);
+        } else if (isExclusiveMultiOption(q.id, opt.en)) {
+          answers[q.id] = [opt.en];
+        } else {
+          answers[q.id] = [...current.filter(x => !isExclusiveMultiOption(q.id, x)), opt.en];
+        }
       }
       clearError();
       renderQuestion();
@@ -1256,12 +1337,24 @@
       if (q.type === "form") {
         const bad = q.fields.some(f => f.required && !String(answers[f.id]||"").trim());
         if (bad) { showError(translations[currentLang].errorForm); return false; }
+        if (q.id === "referenceLinks" && (!isValidUrlValue(answers.reference1) || !isValidUrlValue(answers.reference2))) {
+          showError(translations[currentLang].invalidUrl);
+          return false;
+        }
+        if (q.id === "clientInfo") {
+          if (!isValidNameValue(answers.clientName)) { showError(translations[currentLang].invalidName); return false; }
+          if (!isValidPhoneValue(answers.phone)) { showError(translations[currentLang].invalidPhone); return false; }
+          if (!isValidEmailValue(answers.email)) { showError(translations[currentLang].invalidEmail); return false; }
+          if (!isValidUrlValue(answers.currentWebsite)) { showError(translations[currentLang].invalidUrl); return false; }
+        }
       }
       if (q.type === "assets") {
-        const sel = answers.brandAvailability || [];
-        const ok = (!sel.includes("I have a logo") || String(answers.logoStatus||"").trim()) &&
-                   (!sel.includes("I have brand colors") || (Array.isArray(answers.colors) && answers.colors.every(c => /^#[0-9A-Fa-f]{6}$/.test(c))));
-        if (!ok) { showError(translations[currentLang].errorForm); return false; }
+        const colors = getEffectiveColors();
+        if (hasSelectedLogo() && !getEffectiveLogoStatus()) { showError(translations[currentLang].errorForm); return false; }
+        if (hasSelectedBrandColors() && !(colors.length === DEFAULT_BRAND_COLORS.length && colors.every(c => /^#[0-9A-Fa-f]{6}$/.test(c)))) {
+          showError(translations[currentLang].invalidColors);
+          return false;
+        }
       }
       return true;
     }
@@ -1269,7 +1362,11 @@
     function nextStep() {
       if (!validateStep()) return;
       if (currentStep < questions.length - 1) { currentStep++; renderQuestion(); }
-      else { renderResult(); showScreen("resultScreen"); }
+      else {
+        renderResult();
+        showScreen("resultScreen");
+        submitBrief();
+      }
     }
 
     function prevStep() {
@@ -1281,7 +1378,14 @@
 
     /* ─── RESULT ─── */
     function getVal(id) {
-      const v = answers[id];
+      let v = answers[id];
+      if (id === "logoStatus") {
+        v = getEffectiveLogoStatus() || (currentLang === "en" ? "No logo provided" : "Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ù„ÙˆØ¬Ùˆ Ù…Ø±ÙÙ‚");
+      }
+      if (id === "colors") {
+        v = getEffectiveColors();
+        if (!v.length) return currentLang === "en" ? "No brand colors provided" : "Ù„Ø§ ØªÙˆØ¬Ø¯ Ø£Ù„ÙˆØ§Ù† Ù‡ÙˆÙŠØ© Ù…Ø±ÙÙ‚Ø©";
+      }
       if (!v || v.length === 0) return translations[currentLang].noAnswer;
       return Array.isArray(v) ? v.join(", ") : v;
     }
@@ -1389,8 +1493,9 @@
       getSummaryItems().forEach(item => {
         const lbl      = currentLang === "en" ? item.en : item.ar;
         const isColors = item.en === "Brand Colors";
-        const dots     = isColors && Array.isArray(answers.colors)
-          ? `<div class="color-summary">${answers.colors.map(c=>`<div class="color-dot" style="background:${c}" title="${c}"></div>`).join("")}</div>`
+        const activeColors = getEffectiveColors();
+        const dots     = isColors && activeColors.length
+          ? `<div class="color-summary">${activeColors.map(c=>`<div class="color-dot" style="background:${c}" title="${c}"></div>`).join("")}</div>`
           : "";
         grid.innerHTML += `<div class="summary-item"><span>${lbl}</span><strong>${item.v}</strong>${dots}</div>`;
       });
@@ -1398,6 +1503,7 @@
 
     /* ─── SUBMIT ─── */
     async function submitBrief() {
+      if (isSubmitting) return;
       const btn    = document.getElementById("submitBtn");
       const status = document.getElementById("submitStatus");
       const errBox = document.getElementById("submitError");
@@ -1405,6 +1511,7 @@
 
       status.style.display = errBox.style.display = "none";
 
+      isSubmitting = true;
       btn.disabled = true;
       btn.innerHTML = t.submitting;
 
@@ -1420,7 +1527,8 @@
         submissionLanguage: currentLang.toUpperCase(),
         submissionDate:     directSubmissionDate,
         submissionVersion:  submittedCount + 1,
-        logoFileName:       answers.logoStatus || "",
+        logoFileName:       getEffectiveLogoStatus() || "",
+        logoFileDataUrl:    hasSelectedLogo() ? (logoDataUrl || "") : "",
         summaryText:        getPlainSummary(),
         summaryItems: getSummaryItems().map(item => ({
           label: currentLang === "en" ? item.en : item.ar,
@@ -1463,6 +1571,7 @@
         errBox.textContent   = t.submitError;
         errBox.style.display = "block";
       } finally {
+        isSubmitting = false;
         btn.disabled  = false;
         btn.innerHTML = t.submitBtn;
       }
