@@ -1,0 +1,16 @@
+{
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/main%20copy.html"
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/api/dashboard"
+    },
+    {
+      "source": "/submissions",
+      "destination": "/api/dashboard"
+    }
+  ]
+}

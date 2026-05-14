@@ -1,0 +1,16 @@
+{
+  "name": "easy-app-brief-mailer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Easy App project brief form with direct SMTP delivery",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "check": "node --check server.js"
+  },
+  "dependencies": {
+    "@vercel/blob": "^1.1.1",
+    "dotenv": "^16.6.1",
+    "nodemailer": "^6.10.1"
+  }
+}

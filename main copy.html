@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Easy App | Project Brief Builder</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --navy:       #061b5b;
+      --royal:      #0b7ff3;
+      --sky:        #12a8ff;
+      --baby:       #aad9f7;
+      --ice:        #dff0fc;
+      --white:      #ffffff;
+      --bg:         #f0f8ff;
+      --border:     #cce3f8;
+      --text:       #07133a;
+      --muted:      #5a7a9a;
+      --danger:     #c0392b;
+      --success:    #087a3f;
+      --r:          24px;
+      --r-lg:       32px;
+      --shadow-sm:  0 2px 12px rgba(6,27,91,.08);
+      --shadow:     0 8px 32px rgba(6,27,91,.12);
+      --shadow-lg:  0 20px 60px rgba(6,27,91,.16);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      min-height: 100vh;
+      font-family: "Plus Jakarta Sans", "Cairo", sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      overflow-x: hidden;
+    }
+    body[dir="rtl"] { font-family: "Cairo", "Plus Jakarta Sans", sans-serif; }
+    button, input, textarea, select { font-family: inherit; }
+
+    /* ─── LAYOUT ─── */
+    .app { width: min(1180px, 96%); margin: 0 auto; padding: 14px 0 56px; }
+
+    /* ─── TOPBAR ─── */
+    .topbar {
+      position: sticky; top: 10px; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      margin-bottom: 24px; padding: 10px 14px;
+      background: rgba(255,255,255,.92);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-lg);
+      backdrop-filter: blur(20px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+
+    .logo-box {
+      width: auto; height: auto; border-radius: 0; flex: 0 0 auto;
+      background: transparent; display: inline-flex; align-items: center; justify-content: flex-start;
+      padding: 0; box-shadow: none; overflow: visible;
+    }
+    .logo-box img { height: 72px; width: auto; display: block; object-fit: contain; object-position: center; transform: none; }
+    .brand-text h3 { font-size: .95rem; font-weight: 800; color: var(--navy); line-height: 1.2; }
+    .brand-text p  { font-size: .78rem; color: var(--muted); }
+
+    .lang-toggle { display: flex; gap: 4px; padding: 4px; border-radius: 999px; background: var(--ice); flex: 0 0 auto; }
+    .lang-btn { border: 0; border-radius: 999px; background: transparent; color: var(--muted); padding: 7px 16px; cursor: pointer; font-weight: 800; font-size: .82rem; transition: .22s ease; }
+    .lang-btn.active { background: var(--navy); color: #fff; box-shadow: 0 2px 8px rgba(6,27,91,.25); }
+
+    /* ─── SCREEN TRANSITIONS ─── */
+    .screen { display: none; }
+    .screen.active { display: block; animation: fadeUp .4s ease both; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ─── HERO ─── */
+    .hero-card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-lg);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 620px;
+    }
+
+    .hero-content {
+      padding: clamp(30px,5vw,64px);
+      display: flex; flex-direction: column; justify-content: center;
+      position: relative; z-index: 2;
+    }
+
+    .badge {
+      display: inline-grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      gap: 14px;
+      width: fit-content;
+      margin-bottom: 22px;
+      padding: 12px 18px 12px 12px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, rgba(255,255,255,.96), rgba(232,244,255,.98));
+      border: 1px solid rgba(11,127,243,.12);
+      box-shadow: 0 14px 30px rgba(6,27,91,.08);
+    }
+    .badge-mark {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(145deg, rgba(11,127,243,.14), rgba(29,173,255,.22));
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.8);
+    }
+    .badge-mark svg {
+      width: 22px;
+      height: 22px;
+      color: var(--royal);
+      flex: 0 0 22px;
+    }
+    .badge-copy {
+      display: grid;
+      gap: 3px;
+      min-width: 0;
+    }
+    .badge-label {
+      font-size: .66rem;
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .badge-title {
+      font-size: .96rem;
+      font-weight: 900;
+      line-height: 1.2;
+      color: var(--navy);
+    }
+    body[dir="rtl"] .badge {
+      grid-template-columns: 1fr auto;
+      padding: 12px 12px 12px 18px;
+    }
+    body[dir="rtl"] .badge-copy {
+      text-align: right;
+    }
+    body[dir="rtl"] .badge-label {
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    .hero-title {
+      font-size: clamp(2rem,4.5vw,4.2rem); line-height: 1.06;
+      letter-spacing: -1px; color: var(--navy); margin-bottom: 18px; font-weight: 900;
+    }
+    body[dir="rtl"] .hero-title { letter-spacing: 0; }
+    .hero-title span { background: linear-gradient(100deg,var(--royal),var(--sky)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+    .hero-desc { font-size: 1rem; color: var(--muted); line-height: 1.85; margin-bottom: 28px; max-width: 560px; }
+
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; }
+
+    .btn {
+      border: 0; min-height: 50px; border-radius: 14px; padding: 13px 22px;
+      cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      font-weight: 800; font-size: .9rem; transition: .22s ease;
+      text-align: center; line-height: 1.3; white-space: normal;
+      touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+    }
+    .btn svg {
+      width: 18px;
+      height: 18px;
+      flex: 0 0 18px;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--navy), var(--royal));
+      color: #fff;
+      box-shadow: 0 8px 24px rgba(11,127,243,.28);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(11,127,243,.36); }
+    .btn-secondary { background: var(--ice); color: var(--navy); border: 1.5px solid var(--border); }
+    .btn-secondary:hover { transform: translateY(-2px); background: #d0eaf8; }
+    .btn-ghost { background: transparent; color: var(--navy); border: 1.5px solid var(--border); }
+    .btn-ghost:hover { background: var(--ice); }
+    .btn[disabled] { opacity: .55; cursor: not-allowed; transform: none !important; }
+
+    .trust-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+    .trust-item {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 9px 14px; border-radius: 12px;
+      background: var(--bg); border: 1px solid var(--border);
+      font-size: .8rem; font-weight: 700; color: var(--muted);
+    }
+    .trust-item svg { width: 16px; height: 16px; color: var(--royal); }
+
+    /* ─── HERO VISUAL ─── */
+    .hero-visual {
+      position: relative; overflow: hidden;
+      background: linear-gradient(145deg, #e8f4fd 0%, #cce6f9 50%, #b8d8f5 100%);
+      display: flex; align-items: center; justify-content: center;
+      padding: 40px;
+    }
+    .hero-visual::before {
+      content: ""; position: absolute; inset: 0;
+      background:
+        radial-gradient(circle at 70% 25%, rgba(18,168,255,.25), transparent 45%),
+        radial-gradient(circle at 20% 80%, rgba(6,27,91,.1), transparent 40%);
+    }
+
+    /* Blob shapes */
+    .blob {
+      position: absolute; border-radius: 999px;
+      background: rgba(255,255,255,.18); animation: blobFloat 6s ease-in-out infinite;
+    }
+    .blob-1 { width: 280px; height: 280px; top: -60px; right: -40px; animation-delay: 0s; }
+    .blob-2 { width: 180px; height: 180px; bottom: -20px; left: 10px; animation-delay: 2s; }
+    .blob-3 { width: 120px; height: 120px; top: 50%; right: 20px; animation-delay: 4s; }
+    @keyframes blobFloat { 0%,100%{transform:scale(1) translateY(0);} 50%{transform:scale(1.06) translateY(-12px);} }
+
+    .floating-card {
+      position: absolute; z-index: 12;
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 13px 18px; border-radius: 20px;
+      background: linear-gradient(135deg, rgba(255,255,255,.96), rgba(245,250,255,.92));
+      border: 1px solid rgba(255,255,255,.82);
+      color: var(--navy); font-weight: 800; font-size: .84rem;
+      box-shadow: 0 14px 28px rgba(6,27,91,.12);
+      animation: cardFloat 4.5s ease-in-out infinite; pointer-events: none;
+      line-height: 1.35; max-width: min(280px, calc(100% - 44px));
+      white-space: normal;
+      backdrop-filter: blur(14px);
+    }
+    .floating-card svg { width: 18px; height: 18px; color: var(--royal); flex: 0 0 18px; }
+    .floating-card.fc1 { top: 60px; left: 24px; }
+    .floating-card.fc2 { top: 52%; right: 22px; animation-delay: 1.5s; }
+    .floating-card.fc3 { top: 72%; left: 44px; animation-delay: 3s; }
+    body[dir="rtl"] .floating-card { direction: rtl; }
+    body[dir="rtl"] .floating-card.fc1 { left: auto; right: 24px; }
+    body[dir="rtl"] .floating-card.fc2 { right: 22px; left: auto; }
+    body[dir="rtl"] .floating-card.fc3 { left: auto; right: 44px; }
+    @keyframes cardFloat { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
+
+    /* Phone mockup */
+    .phone-wrap { position: relative; z-index: 8; user-select: none; pointer-events: none; }
+    .phone-mockup {
+      width: 260px; height: 500px; border-radius: 40px; background: #0d1829;
+      padding: 12px; box-shadow: 0 30px 60px rgba(6,27,91,.3), inset 0 0 0 1px rgba(255,255,255,.08);
+      transform: rotate(5deg) translateY(-8px); position: relative; z-index: 10;
+    }
+    .phone-screen { height: 100%; border-radius: 30px; background: #f5fafe; overflow: hidden; padding: 20px; }
+    .ps-notch { width: 70px; height: 8px; background: #0d1829; border-radius: 0 0 8px 8px; margin: 0 auto 16px; }
+    .ps-line { height: 10px; border-radius: 8px; background: var(--ice); margin-bottom: 10px; }
+    .ps-line.med { width: 75%; }
+    .ps-line.sm  { width: 50%; }
+    .ps-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 16px 0; }
+    .ps-box { height: 64px; border-radius: 14px; background: linear-gradient(135deg,var(--white),var(--ice)); border: 1px solid var(--border); display: grid; place-items: center; color: var(--royal); }
+    .ps-box svg { width: 24px; height: 24px; }
+    .ps-btn { height: 36px; background: linear-gradient(90deg,var(--navy),var(--royal)); border-radius: 10px; margin-top: 14px; display: flex; align-items: center; justify-content: center; }
+    .ps-btn-dot { width: 60%; height: 8px; background: rgba(255,255,255,.45); border-radius: 4px; }
+
+    /* ─── QUIZ CARD ─── */
+    .quiz-card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-lg);
+      box-shadow: var(--shadow);
+      padding: clamp(22px,4vw,44px);
+      min-height: 580px;
+    }
+
+    .quiz-top {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      gap: 16px; margin-bottom: 22px;
+    }
+
+    .step-pill {
+      padding: 7px 16px; border-radius: 999px; white-space: nowrap;
+      background: var(--ice); color: var(--royal); font-weight: 800; font-size: .82rem;
+      border: 1px solid var(--border); flex: 0 0 auto;
+    }
+
+    .progress-wrap { margin-bottom: 26px; }
+    .progress-meta { display: flex; justify-content: space-between; font-size: .82rem; font-weight: 700; color: var(--muted); margin-bottom: 8px; }
+    .progress-bar { height: 8px; background: var(--ice); border-radius: 999px; overflow: hidden; border: 1px solid var(--border); }
+    .progress-fill { height: 100%; width: 0; background: linear-gradient(90deg,var(--navy),var(--royal),var(--sky)); border-radius: 999px; transition: width .4s ease; }
+
+    .question-title { font-size: clamp(1.4rem,3vw,2.4rem); color: var(--navy); line-height: 1.2; font-weight: 900; margin-bottom: 8px; }
+    .question-subtitle { color: var(--muted); line-height: 1.75; font-size: .95rem; }
+
+    .required-mark { color: var(--danger); }
+    .optional-mark { color: var(--sky); font-size: .85rem; font-weight: 700; }
+
+    /* ─── OPTIONS GRID ─── */
+    .options-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin: 24px 0; }
+
+    .option-card {
+      border: 2px solid var(--border); background: var(--white);
+      border-radius: 20px; padding: 20px;
+      min-height: 140px; cursor: pointer; transition: .22s ease;
+      display: flex; flex-direction: column; position: relative; overflow: hidden;
+      user-select: none;
+    }
+    .option-card::after {
+      content: ""; position: absolute;
+      width: 80px; height: 80px; right: -24px; bottom: -24px; border-radius: 999px;
+      background: rgba(11,127,243,.07); transition: .22s ease;
+    }
+    body[dir="rtl"] .option-card::after { right: auto; left: -24px; }
+    .option-card:hover {
+      border-color: var(--sky); transform: translateY(-3px);
+      box-shadow: 0 8px 28px rgba(11,127,243,.1);
+    }
+    .option-card:hover::after { background: rgba(11,127,243,.12); }
+    .option-card.selected {
+      border-color: var(--royal); background: #f0f8ff;
+      box-shadow: 0 6px 24px rgba(11,127,243,.14);
+    }
+    .option-card.selected::before {
+      content: "✓"; position: absolute; top: 12px; right: 12px;
+      width: 26px; height: 26px; border-radius: 999px;
+      background: var(--success); color: #fff;
+      display: grid; place-items: center; font-weight: 900; font-size: .8rem; z-index: 3;
+    }
+    body[dir="rtl"] .option-card.selected::before { right: auto; left: 12px; }
+
+    .option-icon {
+      width: 48px; height: 48px; border-radius: 14px;
+      background: var(--ice); color: var(--royal);
+      display: grid; place-items: center; margin-bottom: 14px;
+      flex: 0 0 auto; position: relative; z-index: 2;
+    }
+    .option-icon svg { width: 22px; height: 22px; }
+    .option-title { font-size: .95rem; font-weight: 800; color: var(--navy); margin-bottom: 6px; position: relative; z-index: 2; }
+    .option-desc  { font-size: .8rem; color: var(--muted); line-height: 1.55; position: relative; z-index: 2; }
+
+    /* ─── FORM AREA ─── */
+    .form-area { display: grid; gap: 16px; margin-top: 24px; max-width: 860px; }
+    .field-group { display: grid; gap: 7px; }
+    .field-label { font-weight: 800; color: var(--navy); font-size: .9rem; }
+    .input, .textarea, .select {
+      width: 100%; border: 2px solid var(--border); border-radius: 14px;
+      background: var(--white); padding: 14px 16px; font-size: .95rem;
+      color: var(--text); outline: none; transition: .2s ease;
+    }
+    .textarea { min-height: 110px; resize: vertical; }
+    .input:focus, .textarea:focus, .select:focus { border-color: var(--sky); box-shadow: 0 0 0 4px rgba(18,168,255,.12); }
+    .custom-answer { margin-top: 16px; max-width: 680px; }
+
+    .file-upload { border: 2px dashed var(--border); border-radius: 18px; padding: 18px; background: var(--bg); display: grid; gap: 12px; }
+    .upload-row { display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap; }
+    .logo-preview {
+      width: 84px; height: 84px; border-radius: 16px; border: 2px solid var(--border);
+      background: var(--white); display: grid; place-items: center;
+      overflow: hidden; color: var(--muted); font-size: .72rem; text-align: center; padding: 6px; flex: 0 0 auto;
+    }
+    .logo-preview img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+    .color-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 10px; }
+    .color-picker-card { padding: 12px; border-radius: 14px; border: 1.5px solid var(--border); background: var(--bg); display: grid; gap: 8px; }
+    .color-picker-card input[type="color"] { width: 100%; height: 44px; border: 0; background: transparent; cursor: pointer; padding: 0; border-radius: 10px; }
+    .color-name { font-size: .76rem; color: var(--muted); font-weight: 800; }
+
+    /* ─── ERRORS / STATUS ─── */
+    .error-box, .success-box { margin-top: 16px; padding: 13px 16px; border-radius: 14px; font-weight: 800; display: none; font-size: .9rem; }
+    .error-box { color: var(--danger); background: rgba(192,57,43,.07); border: 1.5px solid rgba(192,57,43,.18); }
+    .success-box { color: var(--success); background: rgba(8,122,63,.07); border: 1.5px solid rgba(8,122,63,.18); }
+
+    /* ─── QUIZ FOOTER ─── */
+    .quiz-footer { display: flex; justify-content: space-between; align-items: center; gap: 14px; margin-top: 24px; padding-top: 20px; border-top: 1.5px solid var(--border); }
+    .helper-note { color: var(--muted); font-size: .82rem; font-weight: 700; text-align: center; flex: 1; }
+
+    /* ─── RESULT CARD ─── */
+    .result-card {
+      background: var(--white); border: 1.5px solid var(--border);
+      border-radius: var(--r-lg); box-shadow: var(--shadow);
+      padding: clamp(22px,4vw,44px);
+    }
+    .result-top { text-align: center; max-width: 740px; margin: 0 auto 28px; }
+    .result-icon {
+      width: 72px; height: 72px; margin: 0 auto 16px; border-radius: 24px;
+      background: linear-gradient(135deg, var(--ice), #c8e8f9);
+      color: var(--royal); display: grid; place-items: center;
+      border: 1.5px solid var(--border);
+    }
+    .result-icon svg { width: 34px; height: 34px; }
+    .result-title { font-size: clamp(1.7rem,4vw,2.9rem); color: var(--navy); margin-bottom: 10px; font-weight: 900; }
+    .result-desc { color: var(--muted); line-height: 1.75; }
+
+    .summary-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; margin: 24px 0; }
+    .summary-item {
+      padding: 16px; border-radius: 16px;
+      background: linear-gradient(135deg, var(--bg), #e8f4fd);
+      border: 1.5px solid var(--border);
+      page-break-inside: avoid;
+    }
+    .summary-item span { display: block; color: var(--muted); font-size: .8rem; font-weight: 800; margin-bottom: 5px; }
+    .summary-item strong { color: var(--navy); font-size: .93rem; line-height: 1.55; word-break: break-word; white-space: pre-wrap; }
+    .color-summary { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 7px; }
+    .color-dot { width: 26px; height: 26px; border-radius: 999px; border: 2px solid #fff; box-shadow: 0 0 0 1.5px rgba(0,0,0,.1); }
+
+    .result-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 28px; }
+
+    /* ─── THANKS CARD ─── */
+    .thanks-card {
+      background: var(--white); border: 1.5px solid var(--border);
+      border-radius: var(--r-lg); box-shadow: var(--shadow-lg);
+      padding: clamp(40px,6vw,80px) clamp(22px,4vw,44px);
+      text-align: center; overflow: hidden; position: relative;
+    }
+    .thanks-bg-blob {
+      position: absolute; border-radius: 999px;
+      background: radial-gradient(circle, rgba(18,168,255,.15), transparent 70%);
+      pointer-events: none;
+    }
+    .thanks-bg-blob.t1 { width: 600px; height: 600px; top: -200px; right: -150px; animation: blobFloat 5s ease-in-out infinite; }
+    .thanks-bg-blob.t2 { width: 400px; height: 400px; bottom: -160px; left: -100px; animation: blobFloat 6.5s ease-in-out infinite reverse; }
+
+    .thanks-inner { position: relative; z-index: 2; max-width: 680px; margin: 0 auto; }
+
+    .thanks-logo {
+      width: 110px; height: 110px; border-radius: 32px; margin: 0 auto 24px;
+      background: linear-gradient(135deg, var(--navy), var(--royal));
+      display: grid; place-items: center;
+      color: #fff; font-size: 1.6rem; font-weight: 900;
+      box-shadow: 0 16px 48px rgba(11,127,243,.3);
+      animation: popIn .8s cubic-bezier(.2,.8,.2,1) both;
+      overflow: hidden;
+    }
+    .thanks-logo img { max-width: 88%; max-height: 88%; object-fit: contain; }
+    @keyframes popIn { from { transform: scale(.7) translateY(20px); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+    .thanks-checkmark {
+      width: 72px; height: 72px; border-radius: 24px; margin: 0 auto 22px;
+      background: linear-gradient(135deg, #eef7ff, #d9edff);
+      border: 1.5px solid var(--border);
+      display: grid; place-items: center;
+      color: var(--royal);
+      box-shadow: 0 14px 34px rgba(11,127,243,.12);
+      animation: popIn .6s .1s cubic-bezier(.2,.8,.2,1) both;
+    }
+    .thanks-checkmark svg { width: 34px; height: 34px; color: currentColor; }
+
+    .thanks-title { font-size: clamp(1.9rem,5vw,3.6rem); color: var(--navy); font-weight: 900; margin-bottom: 14px; }
+    .thanks-desc { color: var(--muted); line-height: 1.85; font-size: 1rem; }
+    .thanks-email-note {
+      margin: 20px auto 0; max-width: 480px;
+      padding: 16px 20px; border-radius: 16px;
+      background: var(--ice); border: 1.5px solid var(--border);
+      color: var(--navy); font-size: .88rem; font-weight: 700;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .thanks-email-note svg { width: 20px; height: 20px; color: var(--royal); flex: 0 0 auto; }
+
+    .thanks-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 28px; }
+
+    /* ─── UTILS ─── */
+    .hidden { display: none !important; }
+    svg { stroke-width: 2; flex: 0 0 auto; }
+
+    /* ─── RESPONSIVE: TABLET ─── */
+    @media (max-width: 900px) {
+      .hero-card { grid-template-columns: 1fr; }
+      .hero-visual { min-height: 320px; padding: 32px; }
+      .options-grid { grid-template-columns: repeat(2,1fr); }
+      .color-grid { grid-template-columns: repeat(3,1fr); }
+      .floating-card.fc2, .floating-card.fc3 { display: none; }
+      .blob { animation: none; }
+      .phone-mockup { width: 200px; height: 380px; }
+      .logo-box { width: auto; height: auto; }
+      .logo-box img { height: 56px; transform: none; }
+    }
+
+    /* ─── RESPONSIVE: MOBILE ─── */
+    @media (max-width: 600px) {
+      .app { width: calc(100% - 16px); padding-top: 8px; }
+      .topbar { top: 6px; border-radius: 18px; padding: 9px 12px; }
+      .brand-text h3 { font-size: .88rem; }
+      .logo-box { width: auto; height: auto; }
+      .logo-box img { height: 48px; transform: none; }
+      .lang-btn { padding: 6px 12px; font-size: .78rem; }
+
+      .hero-card, .quiz-card, .result-card, .thanks-card { border-radius: 20px; }
+      .hero-content { padding: 24px 20px; }
+      .badge {
+        gap: 12px;
+        padding: 10px 14px 10px 10px;
+      }
+      .badge-mark {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+      }
+      .badge-title { font-size: .88rem; }
+      .hero-title { font-size: clamp(1.85rem, 10vw, 2.8rem); }
+      .hero-visual { min-height: 260px; padding: 22px; }
+      .phone-mockup { width: 170px; height: 320px; transform: rotate(0deg); }
+      .phone-screen { padding: 14px; }
+      .ps-box { height: 50px; }
+      .ps-box svg { width: 20px; height: 20px; }
+      .floating-card { display: none; }
+
+      .options-grid, .summary-grid, .color-grid { grid-template-columns: 1fr; }
+      .option-card { min-height: 110px; padding: 16px; }
+      .quiz-top { flex-direction: column; gap: 10px; align-items: flex-start; }
+      .quiz-footer { flex-direction: column-reverse; gap: 10px; }
+      .quiz-footer .btn { width: 100%; justify-content: center; }
+      .helper-note { order: -1; }
+      .actions { flex-direction: column; }
+      .actions .btn { width: 100%; }
+      .trust-row { gap: 8px; }
+      .trust-item { font-size: .76rem; }
+      .result-actions { flex-direction: column; align-items: stretch; }
+      .result-actions .btn { width: 100%; justify-content: center; }
+      .thanks-actions { flex-direction: column; align-items: stretch; }
+      .thanks-actions .btn { width: 100%; justify-content: center; }
+    }
+
+    @media (hover: none) {
+      .btn-primary:hover,
+      .btn-secondary:hover,
+      .btn-ghost:hover {
+        transform: none;
+        box-shadow: none;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      .phone-mockup { transform: none !important; }
+    }
+
+    /* ─── PRINT ─── */
+    @media print {
+      body { background: #fff !important; }
+      .topbar, .actions, .result-actions, #welcomeScreen, #quizScreen, #thanksScreen { display: none !important; }
+      #resultScreen, .screen.active { display: block !important; }
+      .app { width: 100%; padding: 0; }
+      .result-card { box-shadow: none; border: 0; padding: 0; }
+      .summary-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body dir="ltr">
+  <main class="app">
+    <!-- ── TOPBAR ── -->
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo-box" id="brandLogo"><img src="easy-app-logo-compact.png?v=2" alt="Easy App logo"/></div>
+        <div class="brand-text hidden">
+          <h3 data-i18n="brandTitle">Easy App</h3>
+          <p  data-i18n="brandSub">Project Brief Builder</p>
+        </div>
+      </div>
+      <div class="lang-toggle">
+        <button class="lang-btn active" onclick="setLanguage('en')">EN</button>
+        <button class="lang-btn"        onclick="setLanguage('ar')">AR</button>
+      </div>
+    </header>
+
+    <!-- ── WELCOME ── -->
+    <section id="welcomeScreen" class="screen active">
+      <div class="hero-card">
+        <div class="hero-content">
+          <div class="badge" data-i18n="welcomeBadge"></div>
+          <h1 class="hero-title" data-i18n="welcomeTitle"></h1>
+          <p  class="hero-desc"  data-i18n="welcomeDesc"></p>
+          <div class="actions">
+            <button class="btn btn-primary" onclick="startQuiz()" data-i18n="startBtn"></button>
+            <button class="btn btn-secondary" onclick="setLanguage(currentLang==='en'?'ar':'en')" data-i18n="switchBtn"></button>
+          </div>
+          <div class="trust-row">
+            <div class="trust-item" data-i18n="trustOne"></div>
+            <div class="trust-item" data-i18n="trustTwo"></div>
+            <div class="trust-item" data-i18n="trustThree"></div>
+          </div>
+        </div>
+
+        <div class="hero-visual" id="heroVisual">
+          <div class="blob blob-1"></div>
+          <div class="blob blob-2"></div>
+          <div class="blob blob-3"></div>
+
+          <div class="floating-card fc1" data-i18n="floatOne"></div>
+          <div class="floating-card fc2" data-i18n="floatTwo"></div>
+          <div class="floating-card fc3" data-i18n="floatThree"></div>
+
+          <div class="phone-wrap" id="phoneWrap" aria-label="Phone preview">
+            <div class="phone-mockup">
+              <div class="phone-screen">
+                <div class="ps-notch"></div>
+                <div class="ps-line"></div>
+                <div class="ps-line med"></div>
+                <div class="ps-line sm"></div>
+                <div class="ps-grid">
+                  <div class="ps-box" data-icon="layout"></div>
+                  <div class="ps-box" data-icon="mobile"></div>
+                  <div class="ps-box" data-icon="brain"></div>
+                  <div class="ps-box" data-icon="chart"></div>
+                </div>
+                <div class="ps-line" style="margin-top:14px"></div>
+                <div class="ps-line med"></div>
+                <div class="ps-btn"><div class="ps-btn-dot"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── QUIZ ── -->
+    <section id="quizScreen" class="screen">
+      <div class="quiz-card">
+        <div class="quiz-top">
+          <div>
+            <h2 id="questionTitle" class="question-title"></h2>
+            <p  id="questionSubtitle" class="question-subtitle"></p>
+          </div>
+          <div id="stepPill" class="step-pill"></div>
+        </div>
+
+        <div class="progress-wrap">
+          <div class="progress-meta">
+            <span id="progressText"></span>
+            <span id="progressPercent"></span>
+          </div>
+          <div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div>
+        </div>
+
+        <div id="optionsGrid" class="options-grid"></div>
+        <div id="formArea"    class="form-area hidden"></div>
+        <div id="errorBox"    class="error-box"></div>
+
+        <div class="quiz-footer">
+          <button class="btn btn-ghost"    onclick="prevStep()" id="backBtn">Back</button>
+          <div class="helper-note" id="helperNote"></div>
+          <button class="btn btn-primary" onclick="nextStep()" id="nextBtn">Next</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── RESULT ── -->
+    <section id="resultScreen" class="screen">
+      <div class="result-card">
+        <div class="result-top">
+          <div class="result-icon" data-icon="checkCircle"></div>
+          <h2 class="result-title" data-i18n="resultTitle"></h2>
+          <p  class="result-desc"  data-i18n="resultDesc"></p>
+        </div>
+
+        <div id="summaryGrid" class="summary-grid"></div>
+        <div id="submitStatus" class="success-box"></div>
+        <div id="submitError"  class="error-box"></div>
+
+        <div class="result-actions">
+          <button id="submitBtn" class="btn btn-primary" onclick="submitBrief()" data-i18n="submitBtn"></button>
+          <button class="btn btn-ghost"     onclick="printSummary()" data-i18n="printBtn"></button>
+          <button class="btn btn-secondary" onclick="editAnswers()"  data-i18n="editBtn"></button>
+          <button class="btn btn-ghost"     onclick="restartQuiz()"  data-i18n="restartBtn"></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── THANKS ── -->
+    <section id="thanksScreen" class="screen">
+      <div class="thanks-card">
+        <div class="thanks-bg-blob t1"></div>
+        <div class="thanks-bg-blob t2"></div>
+        <div class="thanks-inner">
+          <div class="thanks-checkmark">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M8 3h6l5 5v11a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/>
+              <path d="M14 3v5h5"/>
+              <path d="M9 14l2 2 4-4"/>
+            </svg>
+          </div>
+          <div class="thanks-logo" id="thanksLogo">EA</div>
+          <h2 class="thanks-title" data-i18n="thanksTitle"></h2>
+          <p  class="thanks-desc"  data-i18n="thanksDesc"></p>
+          <div class="thanks-email-note" id="thanksEmailNote">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+            <span data-i18n="thanksEmailLine"></span>
+          </div>
+          <div class="thanks-actions">
+            <button class="btn btn-ghost"     onclick="showScreen('resultScreen')" data-i18n="viewSummaryBtn"></button>
+            <button class="btn btn-secondary" onclick="editAnswers()"              data-i18n="editBtn"></button>
+            <button class="btn btn-ghost"     onclick="restartQuiz()"              data-i18n="restartBtn"></button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    /*
+    ═══════════════════════════════════════════════════
+      SETUP — READ THIS BEFORE PUBLISHING
+    ═══════════════════════════════════════════════════
+
+    1. FORMSPREE ENDPOINT (Auto-reply is already wired below)
+       - Go to https://formspree.io  → sign up free
+       - Create a new form, copy your endpoint (looks like:
+         https://formspree.io/f/xxxxxxxx)
+       - Paste it into FORM_ENDPOINT below
+       - In your Formspree dashboard → form settings → "Auto-Response"
+         enable "Send auto-response to submitter" and write your
+         thank-you message there  ✅
+       - The code already sends _replyto = the client's email so
+         Formspree knows where to deliver the auto-reply.
+
+    2. LOGO FILE
+       - Put easy-app-logo.png (transparent PNG) in the same folder.
+       - Or change BRAND_LOGO_SRC to your actual filename.
+
+    3. TEST
+       - Fill the form once, check your inbox + client inbox.
+       - Disable the FORM_ENDPOINT guard once confirmed working.
+    ═══════════════════════════════════════════════════
+    */
+    const SUBMIT_ENDPOINT = "/api/submit-brief";
+    const BRAND_LOGO_SRC = "easy-app-logo-compact.png?v=2";
+    const LANG_STORAGE_KEY = "easy-app-language";
+
+    let currentLang   = "en";
+    let currentStep   = 0;
+    let answers       = {};
+    let logoDataUrl   = "";
+    let submittedCount = 0;
+
+    /* ─── SVG ICONS ─── */
+    const I = (d) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">${d}</svg>`;
+    const icons = {
+      sparkle:     I(`<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z"/><path d="M19 15l.9 2.6L22 18.5l-2.1.9L19 22l-.9-2.6-2.1-.9 2.1-.9L19 15z"/>`),
+      arrow:       I(`<path d="M5 12h14"/><path d="M13 6l6 6-6 6"/>`),
+      globe:       I(`<circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15 15 0 0 1 0 20"/><path d="M12 2a15 15 0 0 0 0 20"/>`),
+      layout:      I(`<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/><path d="M9 20V9"/>`),
+      mobile:      I(`<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/>`),
+      brain:       I(`<path d="M8 6a3 3 0 0 1 6-1 3 3 0 0 1 4 4 3 3 0 0 1 1 5.7 3 3 0 0 1-4 4.1 3 3 0 0 1-6 0 3 3 0 0 1-4-4.1A3 3 0 0 1 6 9a3 3 0 0 1 2-3z"/><path d="M12 5v14"/><path d="M8 10h4"/><path d="M12 14h4"/>`),
+      chart:       I(`<path d="M4 19V5"/><path d="M4 19h16"/><rect x="7" y="11" width="3" height="5"/><rect x="12" y="8" width="3" height="8"/><rect x="17" y="5" width="3" height="11"/>`),
+      image:       I(`<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8" cy="10" r="2"/><path d="M21 16l-5-5L5 19"/>`),
+      briefcase:   I(`<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/><path d="M3 12h18"/>`),
+      shopping:    I(`<path d="M6 6h15l-2 8H8L6 3H3"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/>`),
+      graduation:  I(`<path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 2 9 2 12 0v-5"/>`),
+      users:       I(`<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>`),
+      palette:     I(`<path d="M12 3a9 9 0 0 0 0 18h1.5a2 2 0 0 0 0-4H12a2 2 0 0 1-2-2 2 2 0 0 1 2-2h1a8 8 0 0 0 8-8c-1.5-1.3-4.5-2-9-2z"/><circle cx="7.5" cy="10" r=".5"/><circle cx="10" cy="7" r=".5"/><circle cx="14" cy="7" r=".5"/>`),
+      diamond:     I(`<path d="M6 3h12l4 6-10 12L2 9l4-6z"/><path d="M2 9h20"/><path d="M12 21L8 9l4-6 4 6-4 12z"/>`),
+      zap:         I(`<path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/>`),
+      target:      I(`<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>`),
+      phone:       I(`<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07A19.5 19.5 0 0 1 3.15 12 19.8 19.8 0 0 1 .08 3.18 2 2 0 0 1 2.06 1h3a2 2 0 0 1 2 1.72c.12.9.33 1.77.62 2.6a2 2 0 0 1-.45 2.11L6 8.67a16 16 0 0 0 7.33 7.33l1.24-1.23a2 2 0 0 1 2.11-.45c.83.29 1.7.5 2.6.62A2 2 0 0 1 22 16.92z"/>`),
+      mail:        I(`<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>`),
+      clock:       I(`<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>`),
+      calendar:    I(`<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>`),
+      upload:      I(`<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/>`),
+      checkCircle: I(`<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/>`),
+      print:       I(`<path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/>`)
+    };
+
+    /* ─── TRANSLATIONS ─── */
+    const translations = {
+      en: {
+        brandTitle: "Easy App",
+        brandSub:   "Project Brief Builder",
+        welcomeBadge:  `<span class="badge-mark">${icons.sparkle}</span><span class="badge-copy"><span class="badge-label">Guided intake</span><span class="badge-title">Interactive project brief</span></span>`,
+        welcomeTitle:  `Build a clear brief for your <span>digital project.</span>`,
+        welcomeDesc:   "Answer a short guided brief so we understand your project type, style, features, brand assets, contact method, and review schedule. You can edit before or after sending.",
+        startBtn:      `Start Project Brief ${icons.arrow}`,
+        switchBtn:     `Switch Language ${icons.globe}`,
+        trustOne:      `${icons.checkCircle} Clear client answers`,
+        trustTwo:      `${icons.mail} Auto email confirmation`,
+        trustThree:    `${icons.print} Printable summary`,
+        floatOne:      `${icons.layout} Websites & Apps`,
+        floatTwo:      `${icons.brain} AI & Data`,
+        floatThree:    `${icons.image} UI/UX & Design`,
+        back: "Back", next: "Next", finish: "Show Summary",
+        step: "Step", of: "of",
+        chooseOne: "Required: choose one option to continue",
+        chooseMultiple: "Required: choose at least one option",
+        optionalForm: "Optional: you can skip this step",
+        requiredForm: "Required: fill all fields on this step",
+        progress: "Progress",
+        errorRequired: "Please answer this question before continuing.",
+        errorForm: "Please fill all required fields before continuing.",
+        resultTitle: "Review Your Project Brief",
+        resultDesc: "Check the summary below. Submit it directly, print it, or edit your answers. If you edit and submit again, the updated version will be sent.",
+        submitBtn:   `${icons.mail} Submit Brief`,
+        printBtn:    `${icons.print} Print Summary`,
+        editBtn:     "Edit Answers",
+        restartBtn:  "Start Again",
+        optional:    "Optional",
+        noAnswer:    "Not answered",
+        uploadLogo:  "Upload logo file",
+        noLogo:      "No logo selected",
+        color1: "Primary", color2: "Secondary", color3: "Dark Navy", color4: "Accent Blue", color5: "Light Background",
+        customOther: "Please explain your other choice",
+        submitSuccess: "Submitted successfully. Thank you.",
+        submitError:   "Submission failed. Please check your mail server or internet connection.",
+        submitting:    "Submitting…",
+        thanksTitle:   "Submission Received",
+        thanksDesc:    "Your project brief has been received successfully. Our team will review the details and contact you with the recommended scope, timeline, and next steps for your project.",
+        thanksEmailLine: "A confirmation email with your submission details has been sent to your inbox.",
+        viewSummaryBtn: "View Summary"
+      },
+      ar: {
+        brandTitle: "Easy App",
+        brandSub:   "استبيان المشروع",
+        welcomeBadge:  `${icons.sparkle} استبيان تفاعلي للمشروع`,
+        welcomeTitle:  `ابنِ استبيانًا واضحًا <span>لمشروعك الرقمي.</span>`,
+        welcomeDesc:   "أجب على استبيان قصير وموجه حتى نفهم نوع المشروع، الستايل، الخصائص، ملفات الهوية، طريقة التواصل، وجدول المراجعة. يمكنك التعديل قبل أو بعد الإرسال.",
+        startBtn:      `ابدأ استبيان المشروع ${icons.arrow}`,
+        switchBtn:     `تغيير اللغة ${icons.globe}`,
+        trustOne:      `${icons.checkCircle} إجابات عميل واضحة`,
+        trustTwo:      `${icons.mail} تأكيد بريد تلقائي`,
+        trustThree:    `${icons.print} ملخص قابل للطباعة`,
+        floatOne:      `${icons.layout} مواقع وتطبيقات`,
+        floatTwo:      `${icons.brain} ذكاء اصطناعي وبيانات`,
+        floatThree:    `${icons.image} خدمات تصميم`,
+        back: "السابق", next: "التالي", finish: "عرض الملخص",
+        step: "خطوة", of: "من",
+        chooseOne: "مطلوب: اختر إجابة واحدة للمتابعة",
+        chooseMultiple: "مطلوب: اختر اختيارًا واحدًا على الأقل",
+        optionalForm: "اختياري: يمكنك تخطي هذه الخطوة",
+        requiredForm: "مطلوب: املأ كل الحقول في هذه الخطوة",
+        progress: "التقدم",
+        errorRequired: "من فضلك أجب على هذا السؤال قبل المتابعة.",
+        errorForm: "من فضلك املأ كل الحقول المطلوبة قبل المتابعة.",
+        resultTitle: "راجع استبيان مشروعك",
+        resultDesc: "راجع الملخص بالأسفل. أرسله مباشرة، اطبعه، أو عدّل الإجابات. إذا عدلت وأرسلت مرة أخرى، ستصل النسخة المحدثة.",
+        submitBtn:   `${icons.mail} إرسال الاستبيان`,
+        printBtn:    `${icons.print} طباعة الملخص`,
+        editBtn:     "تعديل الإجابات",
+        restartBtn:  "ابدأ من جديد",
+        optional:    "اختياري",
+        noAnswer:    "لم يتم الإجابة",
+        uploadLogo:  "رفع ملف اللوجو",
+        noLogo:      "لا يوجد لوجو محدد",
+        color1: "أساسي", color2: "ثانوي", color3: "كحلي داكن", color4: "أزرق مميز", color5: "خلفية فاتحة",
+        customOther: "من فضلك وضح الاختيار الآخر",
+        submitSuccess: "تم الإرسال بنجاح. شكرًا لك.",
+        submitError:   "فشل الإرسال. من فضلك تأكد من خادم البريد أو الاتصال بالإنترنت.",
+        submitting:    "جاري الإرسال...",
+        thanksTitle:   "تم استلام الطلب",
+        thanksDesc:    "تم استلام استبيان مشروعك بنجاح. سيقوم فريقنا بمراجعة التفاصيل والتواصل معك بخصوص النطاق المناسب والمدة الزمنية والخطوات التالية لمشروعك.",
+        thanksEmailLine: "تم إرسال رسالة تأكيد تتضمن تفاصيل الإرسال إلى بريدك الإلكتروني.",
+        viewSummaryBtn: "عرض الملخص"
+      }
+    };
+
+    /* ─── QUESTIONS ─── */
+    const questions = [
+      {
+        id: "serviceType", type: "multiple", required: true,
+        title:    { en: "What service do you need?",       ar: "ما الخدمة التي تحتاجها؟" },
+        subtitle: { en: "Choose all services related to your project.", ar: "اختر كل الخدمات المرتبطة بمشروعك." },
+        options: [
+          { icon:"layout",     en:"Website / Web Platform",       ar:"موقع / منصة ويب",           descEn:"Business website, platform, dashboard, or landing page.",              descAr:"موقع شركة، منصة، لوحة تحكم، أو صفحة هبوط." },
+          { icon:"mobile",     en:"Mobile Application",           ar:"تطبيق موبايل",              descEn:"Android, iOS, or cross-platform mobile app.",                           descAr:"تطبيق أندرويد، iOS، أو تطبيق متعدد المنصات." },
+          { icon:"brain",      en:"AI Model / AI Feature",        ar:"موديل ذكاء اصطناعي / خاصية AI", descEn:"Prediction, chatbot, computer vision, NLP, or automation.",         descAr:"تنبؤ، شات بوت، رؤية حاسوبية، معالجة لغة، أو أتمتة." },
+          { icon:"chart",      en:"Data Analytics / Dashboard",   ar:"تحليل بيانات / داشبورد",    descEn:"Data cleaning, reports, Power BI, Streamlit, or insights.",             descAr:"تنظيف بيانات، تقارير، Power BI، Streamlit، أو تحليلات." },
+          { icon:"image",      en:"Photoshop / Graphic Design",   ar:"فوتوشوب / تصميم جرافيك",   descEn:"Social media, branding, photo editing, banners, or ads.",                descAr:"سوشيال ميديا، هوية، تعديل صور، بنرات، أو إعلانات." }
+        ]
+      },
+      {
+        id: "projectGoal", type: "single", required: true,
+        title:    { en: "What is the main goal of this project?", ar: "ما الهدف الأساسي من المشروع؟" },
+        subtitle: { en: "This helps us focus the solution on the right outcome.", ar: "هذا يساعدنا في توجيه الحل للنتيجة المطلوبة." },
+        options: [
+          { icon:"target",     en:"Get More Customers / Leads",     ar:"جذب عملاء أكثر",           descEn:"Generate inquiries, calls, bookings, or sales.",        descAr:"جذب استفسارات، مكالمات، حجوزات، أو مبيعات." },
+          { icon:"shopping",   en:"Sell Online",                     ar:"البيع أونلاين",             descEn:"Sell products, services, courses, or subscriptions.",   descAr:"بيع منتجات، خدمات، كورسات، أو اشتراكات." },
+          { icon:"briefcase",  en:"Present the Business Professionally", ar:"عرض النشاط بشكل احترافي", descEn:"Improve trust, brand image, and online presence.",    descAr:"تحسين الثقة، صورة البراند، والوجود الرقمي." },
+          { icon:"brain",      en:"Automate or Predict Something",  ar:"أتمتة أو تنبؤ بشيء",      descEn:"Use AI, data, or automation to improve decisions.",      descAr:"استخدام AI أو البيانات أو الأتمتة لتحسين القرار." },
+          { icon:"palette",    en:"Improve Visual Identity",        ar:"تحسين الهوية البصرية",      descEn:"Make the brand look more professional and consistent.",  descAr:"جعل البراند أكثر احترافية واتساقًا." }
+        ]
+      },
+      {
+        id: "businessField", type: "single", required: true, hasOther: true,
+        title:    { en: "Which field is your business in?", ar: "ما مجال نشاطك؟" },
+        subtitle: { en: "Choose the closest field. If you choose Other, please explain it.", ar: "اختر المجال الأقرب. إذا اخترت مجال آخر، من فضلك وضحه." },
+        options: [
+          { icon:"graduation", en:"Education / Training",  ar:"تعليم / تدريب",      descEn:"Courses, academies, coaching, or consulting.", descAr:"كورسات، أكاديميات، تدريب، أو استشارات." },
+          { icon:"briefcase",  en:"Business Services",     ar:"خدمات أعمال",         descEn:"Agencies, consulting, B2B, or professional services.", descAr:"وكالات، استشارات، خدمات شركات، أو خدمات احترافية." },
+          { icon:"shopping",   en:"Products / Store",      ar:"منتجات / متجر",      descEn:"Physical or digital products.", descAr:"منتجات ملموسة أو رقمية." },
+          { icon:"users",      en:"Personal Brand",        ar:"براند شخصي",          descEn:"Portfolio, expert profile, or public figure website.", descAr:"بورتفوليو، خبير، أو شخصية عامة." },
+          { icon:"target",     en:"Other",                 ar:"مجال آخر",            descEn:"Different type of business or custom idea.", descAr:"نشاط مختلف أو فكرة مخصصة." }
+        ]
+      },
+      {
+        id: "style", type: "single", required: true,
+        title:    { en: "What should the project style feel like?", ar: "ما الإحساس المطلوب من المشروع؟" },
+        subtitle: { en: "This controls the design direction and content tone.", ar: "هذا يحدد اتجاه التصميم وأسلوب المحتوى." },
+        options: [
+          { icon:"briefcase",  en:"Corporate & Professional", ar:"رسمي واحترافي",    descEn:"Trust, clarity, and business credibility.",         descAr:"ثقة، وضوح، ومصداقية تجارية." },
+          { icon:"palette",    en:"Modern & Creative",        ar:"مودرن وكرييتف",    descEn:"Fresh visuals and unique experience.",               descAr:"تصميم حديث وتجربة مميزة." },
+          { icon:"diamond",    en:"Luxury & Premium",         ar:"فاخر وبريميوم",    descEn:"Elegant look for a high-end brand.",                 descAr:"مظهر راقٍ لبراند فاخر." },
+          { icon:"zap",        en:"Simple & Fast",            ar:"بسيط وسريع",       descEn:"Clean, direct, and easy to use.",                    descAr:"واضح، مباشر، وسهل الاستخدام." },
+          { icon:"target",     en:"Sales Focused",            ar:"مركز على البيع",   descEn:"Designed for conversions and action.",               descAr:"مصمم للتحويلات واتخاذ القرار." }
+        ]
+      },
+      {
+        id: "referenceLinks", type: "form", required: false,
+        title:    { en: "Which websites, apps, or designs do you like?", ar: "ما المواقع أو التطبيقات أو التصميمات التي تعجبك؟" },
+        subtitle: { en: "Optional. Add links and explain what you like, or skip this step.", ar: "اختياري. أضف روابط واشرح ما يعجبك، أو تخطَ هذه الخطوة." },
+        fields: [
+          { id:"reference1",     type:"text",     required:false, en:"Reference link 1",                            ar:"رابط مرجعي ١" },
+          { id:"reference2",     type:"text",     required:false, en:"Reference link 2",                            ar:"رابط مرجعي ٢" },
+          { id:"referenceNotes", type:"textarea", required:false, en:"What do you like about these references?",    ar:"ما الذي يعجبك في هذه المراجع؟" }
+        ]
+      },
+      {
+        id: "features", type: "multiple", required: true,
+        title:    { en: "Which features or deliverables do you need?", ar: "ما الخصائص أو المخرجات التي تحتاجها؟" },
+        subtitle: { en: "Choose all that apply to your project.", ar: "اختر كل ما يناسب مشروعك." },
+        options: [
+          { icon:"shopping",   en:"Cart / Checkout",         ar:"سلة / دفع",              descEn:"For selling online.",                                     descAr:"للبيع أونلاين." },
+          { icon:"briefcase",  en:"Admin Dashboard",         ar:"لوحة تحكم",              descEn:"Manage users, content, products, or orders.",             descAr:"إدارة المستخدمين، المحتوى، المنتجات، أو الطلبات." },
+          { icon:"users",      en:"Login / User Accounts",   ar:"تسجيل دخول / حسابات",   descEn:"Profiles, saved data, or user dashboard.",                descAr:"حسابات، بيانات محفوظة، أو لوحة مستخدم." },
+          { icon:"brain",      en:"AI Prediction / Chatbot", ar:"تنبؤ AI / شات بوت",      descEn:"AI model, chatbot, classification, or recommendation.",   descAr:"موديل AI، شات بوت، تصنيف، أو توصية." },
+          { icon:"chart",      en:"Reports / Data Dashboard",ar:"تقارير / داشبورد بيانات", descEn:"Charts, KPIs, analytics, or insights.",                  descAr:"رسوم بيانية، مؤشرات، تحليلات، أو رؤى." },
+          { icon:"mobile",     en:"Mobile App Screens",      ar:"شاشات تطبيق موبايل",     descEn:"App UI/UX and mobile features.",                          descAr:"تصميم واجهة وتجربة تطبيق موبايل." },
+          { icon:"image",      en:"Social Media Designs",    ar:"تصميمات سوشيال ميديا",   descEn:"Posts, banners, stories, or ads.",                        descAr:"بوستات، بنرات، ستوريز، أو إعلانات." },
+          { icon:"palette",    en:"Brand Identity",          ar:"هوية بصرية",             descEn:"Logo refinement, color system, and visual style.",         descAr:"تحسين لوجو، نظام ألوان، وستايل بصري." },
+          { icon:"mail",       en:"Email / Contact Forms",   ar:"نماذج تواصل / بريد",     descEn:"Lead forms and inquiry collection.",                      descAr:"نماذج لجمع الاستفسارات والعملاء." }
+        ]
+      },
+      {
+        id: "brandAvailability", type: "multiple", required: true,
+        title:    { en: "What brand assets do you already have?", ar: "ما ملفات الهوية المتوفرة لديك؟" },
+        subtitle: { en: "If you choose logo or colors, the next step will ask you to add them.", ar: "إذا اخترت لوجو أو ألوان، الخطوة التالية ستطلب إضافتهم." },
+        options: [
+          { icon:"upload",     en:"I have a logo",                    ar:"لدي لوجو",               descEn:"I can upload or name the logo file.",              descAr:"أستطيع رفع أو كتابة اسم ملف اللوجو." },
+          { icon:"palette",    en:"I have brand colors",              ar:"لدي ألوان هوية",          descEn:"I can select the brand color palette.",            descAr:"أستطيع تحديد لوحة ألوان الهوية." },
+          { icon:"image",      en:"I have images / media",            ar:"لدي صور / ملفات بصرية",  descEn:"Photos, videos, product images, or graphics.",     descAr:"صور، فيديوهات، صور منتجات، أو جرافيك." },
+          { icon:"target",     en:"I need help creating the brand assets", ar:"أحتاج مساعدة في إنشاء الهوية", descEn:"I do not have ready assets yet.", descAr:"لا أملك ملفات جاهزة بعد." }
+        ]
+      },
+      {
+        id: "brandAssets", type: "assets", required: false,
+        title:    { en: "Add your logo and brand colors", ar: "أضف اللوجو وألوان الهوية" },
+        subtitle: { en: "This step changes based on what you selected before. If you do not have logo/colors, you can continue.", ar: "هذه الخطوة تتغير حسب اختيارك السابق. إذا لا يوجد لوجو أو ألوان، يمكنك المتابعة." }
+      },
+      {
+        id: "preparedAssets", type: "multiple", required: true,
+        title:    { en: "What else is ready for the project?", ar: "ما الأشياء الأخرى الجاهزة للمشروع؟" },
+        subtitle: { en: "Choose everything that is already prepared.", ar: "اختر كل ما هو جاهز لديك." },
+        options: [
+          { icon:"briefcase",  en:"Services / Products List", ar:"قائمة خدمات / منتجات",  descEn:"Main offers are already listed.",                       descAr:"العروض الأساسية جاهزة." },
+          { icon:"image",      en:"Images / Media",           ar:"صور / ملفات بصرية",      descEn:"Photos, videos, product images, or graphics.",           descAr:"صور، فيديوهات، صور منتجات، أو جرافيك." },
+          { icon:"chart",      en:"Data Files",               ar:"ملفات بيانات",            descEn:"CSV, Excel, database, or reports.",                      descAr:"CSV، Excel، قاعدة بيانات، أو تقارير." },
+          { icon:"layout",     en:"Written Content",          ar:"محتوى مكتوب",            descEn:"Website text, service descriptions, or captions.",       descAr:"نصوص الموقع، وصف الخدمات، أو الكابشن." },
+          { icon:"target",     en:"Need Help Preparing Everything", ar:"أحتاج مساعدة في تجهيز كل شيء", descEn:"Content, visuals, structure, and planning.", descAr:"مساعدة في المحتوى، الصور، الهيكل، والتخطيط." }
+        ]
+      },
+      {
+        id: "contactPreference", type: "single", required: true,
+        title:    { en: "What is your preferred contact method?", ar: "ما طريقة التواصل المفضلة لديك؟" },
+        subtitle: { en: "Choose the easiest way for updates, approvals, and questions.", ar: "اختر أسهل طريقة للتحديثات والموافقات والأسئلة." },
+        options: [
+          { icon:"mail",       en:"Email",                        ar:"البريد الإلكتروني",  descEn:"Best for official details and files.",               descAr:"مناسب للتفاصيل الرسمية والملفات." },
+          { icon:"phone",      en:"Phone Call",                   ar:"مكالمة هاتفية",      descEn:"Useful for urgent clarifications.",                  descAr:"مفيد للتوضيحات العاجلة." },
+          { icon:"calendar",   en:"Scheduled Online Meeting",     ar:"اجتماع أونلاين محدد", descEn:"A planned call when needed.",                        descAr:"اجتماع مرتب عند الحاجة." },
+          { icon:"mail",       en:"Email + Calls When Needed",    ar:"إيميل + مكالمات عند الحاجة", descEn:"Organized updates plus quick clarification.", descAr:"تحديثات منظمة مع توضيحات سريعة عند الحاجة." }
+        ]
+      },
+      {
+        id: "reviewFrequency", type: "single", required: true,
+        title:    { en: "How often would you like to review progress?", ar: "كل قد إيه تحب تراجع تقدم العمل؟" },
+        subtitle: { en: "Select how often you want to check what has been done.", ar: "اختر كل قد إيه تريد مراجعة ما تم تنفيذه." },
+        options: [
+          { icon:"clock",      en:"Every 24 Hours",            ar:"كل ٢٤ ساعة",        descEn:"Frequent daily progress updates.",                    descAr:"تحديثات يومية متكررة." },
+          { icon:"calendar",   en:"Every 2–3 Days",            ar:"كل يومين إلى ٣ أيام", descEn:"Balanced review rhythm.",                           descAr:"مراجعة متوازنة ومناسبة." },
+          { icon:"calendar",   en:"Weekly",                    ar:"أسبوعيًا",           descEn:"Best for structured projects.",                       descAr:"مناسب للمشاريع المنظمة." },
+          { icon:"calendar",   en:"Every 2 Weeks",             ar:"كل أسبوعين",         descEn:"For projects with fewer approvals.",                  descAr:"للمشاريع التي لا تحتاج مراجعة مستمرة." },
+          { icon:"calendar",   en:"Monthly",                   ar:"شهريًا",             descEn:"For long-term projects or maintenance.",              descAr:"للمشاريع طويلة المدى أو الصيانة." },
+          { icon:"target",     en:"Only at Major Milestones",  ar:"عند المراحل المهمة فقط", descEn:"Review after key stages.",                        descAr:"مراجعة بعد المراحل الأساسية." }
+        ]
+      },
+      {
+        id: "timeline", type: "single", required: true,
+        title:    { en: "When do you prefer to launch or receive the final delivery?", ar: "متى تفضل الإطلاق أو استلام التسليم النهائي؟" },
+        subtitle: { en: "Choose the closest timeline.", ar: "اختر المدة الأقرب." },
+        options: [
+          { icon:"zap",        en:"As Soon As Possible",  ar:"في أسرع وقت",      descEn:"Fast delivery is a priority.",              descAr:"التسليم السريع أولوية." },
+          { icon:"calendar",   en:"Within 2 Weeks",       ar:"خلال أسبوعين",     descEn:"Short turnaround with focused scope.",      descAr:"تسليم سريع ونطاق محدد." },
+          { icon:"calendar",   en:"1 Month",              ar:"شهر واحد",          descEn:"Standard delivery for small projects.",     descAr:"تسليم عادي للمشاريع الصغيرة." },
+          { icon:"calendar",   en:"2–3 Months",           ar:"شهرين إلى ٣",      descEn:"Medium scope with revisions.",              descAr:"نطاق متوسط مع مراجعات." },
+          { icon:"calendar",   en:"3–6 Months",           ar:"٣ إلى ٦ أشهر",    descEn:"Full project with all features.",            descAr:"مشروع كامل بكل الخصائص." },
+          { icon:"clock",      en:"Flexible / Not Sure",  ar:"مرن / غير محدد",   descEn:"No hard deadline yet.",                     descAr:"لا يوجد موعد محدد بعد." }
+        ]
+      },
+      {
+        id: "budgetDirection", type: "single", required: true,
+        title:    { en: "What level of project investment are you considering?", ar: "ما مستوى الاستثمار الذي تفكر فيه للمشروع؟" },
+        subtitle: { en: "This helps us suggest the right package and scope.", ar: "هذا يساعدنا في اقتراح الباقة والنطاق المناسب." },
+        options: [
+          { icon:"zap",        en:"Starter — Core features only",  ar:"مبتدئ — الأساسيات فقط",   descEn:"Minimum viable product, essentials first.",        descAr:"منتج أساسي قابل للتطبيق." },
+          { icon:"briefcase",  en:"Standard — Full feature set",   ar:"عادي — كل الخصائص",        descEn:"All required features, polished and complete.",    descAr:"كل الخصائص المطلوبة، منقح وكامل." },
+          { icon:"diamond",    en:"Premium — Best quality",        ar:"بريميوم — أعلى جودة",      descEn:"Top quality, extra polish, premium delivery.",     descAr:"أعلى جودة، تسليم ممتاز." }
+        ]
+      },
+      {
+        id: "clientInfo", type: "form", required: true,
+        title:    { en: "Your contact information", ar: "معلومات التواصل" },
+        subtitle: { en: "We will use this to send your confirmation and reach out with our proposal.", ar: "سنستخدم هذه المعلومات لإرسال التأكيد والتواصل معك باقتراحنا." },
+        fields: [
+          { id:"clientName",      type:"text",  required:true,  en:"Your name or company name",    ar:"اسمك أو اسم الشركة" },
+          { id:"phone",           type:"tel",   required:true,  en:"Phone number",                 ar:"رقم الهاتف" },
+          { id:"email",           type:"email", required:true,  en:"Email address",                ar:"البريد الإلكتروني" },
+          { id:"currentWebsite",  type:"text",  required:false, en:"Current website or page (optional)", ar:"الموقع أو الصفحة الحالية (اختياري)" },
+          { id:"notes",           type:"textarea", required:false, en:"Any additional notes or questions", ar:"ملاحظات أو أسئلة إضافية" }
+        ]
+      }
+    ];
+
+    /* ─── LANGUAGE ─── */
+    function setLanguage(lang) {
+      currentLang = lang;
+      try {
+        localStorage.setItem(LANG_STORAGE_KEY, lang);
+      } catch {}
+      document.body.dir = lang === "ar" ? "rtl" : "ltr";
+      document.querySelectorAll(".lang-btn").forEach(b => b.classList.toggle("active", b.textContent.trim().toLowerCase() === lang));
+
+      document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.dataset.i18n;
+        if (translations[lang][key] !== undefined) el.innerHTML = translations[lang][key];
+      });
+
+      const floatThreeEl = document.querySelector('[data-i18n="floatThree"]');
+      const floatTwoEl = document.querySelector('[data-i18n="floatTwo"]');
+      const badgeEl = document.querySelector('[data-i18n="welcomeBadge"]');
+      if (badgeEl) {
+        badgeEl.innerHTML = lang === "ar"
+          ? `<span class="badge-mark">${icons.sparkle}</span><span class="badge-copy"><span class="badge-label">\u0646\u0645\u0648\u0630\u062c \u0630\u0643\u064a</span><span class="badge-title">\u0627\u0633\u062a\u0628\u064a\u0627\u0646 \u0645\u0634\u0631\u0648\u0639 \u062a\u0641\u0627\u0639\u0644\u064a</span></span>`
+          : `<span class="badge-mark">${icons.sparkle}</span><span class="badge-copy"><span class="badge-label">Guided intake</span><span class="badge-title">Interactive project brief</span></span>`;
+      }
+      if (floatTwoEl) {
+        floatTwoEl.innerHTML = lang === "ar"
+          ? `${icons.brain} \u0630\u0643\u0627\u0621 \u0627\u0635\u0637\u0646\u0627\u0639\u064a \u0648\u0628\u064a\u0627\u0646\u0627\u062a`
+          : `${icons.brain} AI & Data`;
+      }
+      if (floatThreeEl) {
+        floatThreeEl.innerHTML = lang === "ar"
+          ? `${icons.image} UI/UX \u0648\u062a\u0635\u0645\u064a\u0645`
+          : `${icons.image} UI/UX & Design`;
+      }
+
+      // inject icons into PS boxes
+      document.querySelectorAll("[data-icon]").forEach(el => {
+        const icon = el.dataset.icon;
+        if (icons[icon]) el.innerHTML = icons[icon];
+      });
+
+      // logo
+      const logoEl  = document.getElementById("brandLogo");
+      const thanksL = document.getElementById("thanksLogo");
+      const img = new Image();
+      img.onload = () => {
+        logoEl.innerHTML = thanksL.innerHTML = `<img src="${BRAND_LOGO_SRC}" alt="Logo" />`;
+      };
+      img.onerror = () => {};
+      img.src = BRAND_LOGO_SRC;
+    }
+
+    function showScreen(id) {
+      document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+      const el = document.getElementById(id);
+      if (el) { el.classList.add("active"); window.scrollTo({ top: 0, behavior: "smooth" }); }
+    }
+
+    function startQuiz() { currentStep = 0; showScreen("quizScreen"); renderQuestion(); }
+
+    /* ─── RENDER QUESTION ─── */
+    function renderQuestion() {
+      const q = questions[currentStep];
+      if (!q) return;
+      clearError();
+
+      const total   = questions.length;
+      const pct     = Math.round(((currentStep + 1) / total) * 100);
+      const t       = translations[currentLang];
+      const mark    = q.required ? `<span class="required-mark">*</span>` : `<span class="optional-mark">(${t.optional})</span>`;
+
+      document.getElementById("questionTitle").innerHTML    = `${q.title[currentLang]} ${mark}`;
+      document.getElementById("questionSubtitle").textContent = q.subtitle[currentLang];
+      document.getElementById("stepPill").textContent       = `${t.step} ${currentStep + 1} ${t.of} ${total}`;
+      document.getElementById("progressText").textContent   = `${t.progress}: ${currentStep + 1}/${total}`;
+      document.getElementById("progressPercent").textContent = `${pct}%`;
+      document.getElementById("progressFill").style.width   = `${pct}%`;
+      document.getElementById("backBtn").style.visibility   = currentStep === 0 ? "hidden" : "visible";
+      document.getElementById("nextBtn").textContent        = currentStep === total - 1 ? t.finish : t.next;
+
+      let helper = q.required ? t.chooseOne : t.optionalForm;
+      if (q.type === "multiple") helper = q.required ? t.chooseMultiple : t.optionalForm;
+      if (q.type === "form" || q.type === "assets") helper = q.required ? t.requiredForm : t.optionalForm;
+      document.getElementById("helperNote").textContent = helper;
+
+      const grid    = document.getElementById("optionsGrid");
+      const form    = document.getElementById("formArea");
+      grid.innerHTML = ""; form.innerHTML = "";
+
+      if (q.type === "form")   return renderFormQ(q);
+      if (q.type === "assets") return renderAssetsQ();
+
+      grid.classList.remove("hidden");
+      form.classList.add("hidden");
+
+      q.options.forEach(opt => {
+        const stored   = answers[q.id];
+        const selected = q.type === "multiple"
+          ? Array.isArray(stored) && stored.includes(opt.en)
+          : stored === opt.en;
+
+        const card = document.createElement("div");
+        card.className = `option-card${selected ? " selected" : ""}`;
+        card.onclick   = () => selectOption(q, opt);
+        card.innerHTML = `
+          <div class="option-icon">${icons[opt.icon] || icons.target}</div>
+          <div class="option-title">${opt[currentLang]}</div>
+          <div class="option-desc">${currentLang === "en" ? opt.descEn : opt.descAr}</div>
+        `;
+        grid.appendChild(card);
+      });
+
+      if (q.hasOther && answers[q.id] === "Other") {
+        form.classList.remove("hidden");
+        form.innerHTML = `
+          <div class="field-group custom-answer">
+            <label class="field-label">${translations[currentLang].customOther} <span class="required-mark">*</span></label>
+            <input class="input" value="${answers[q.id + 'Other'] || ''}" oninput="answers['${q.id}Other'] = this.value" />
+          </div>`;
+      }
+    }
+
+    function renderFormQ(q) {
+      const grid = document.getElementById("optionsGrid");
+      const form = document.getElementById("formArea");
+      grid.classList.add("hidden");
+      form.classList.remove("hidden");
+
+      q.fields.forEach(f => {
+        const val = answers[f.id] || "";
+        const lbl = f[currentLang];
+        const req = q.required && f.required ? `<span class="required-mark">*</span>` : "";
+        const tag = f.type === "textarea"
+          ? `<textarea class="textarea" placeholder="${lbl}" oninput="answers['${f.id}'] = this.value">${val}</textarea>`
+          : `<input class="input" type="${f.type || 'text'}" value="${val}" placeholder="${lbl}" oninput="answers['${f.id}'] = this.value" />`;
+        form.innerHTML += `<div class="field-group"><label class="field-label">${lbl} ${req}</label>${tag}</div>`;
+      });
+    }
+
+    function renderAssetsQ() {
+      const grid = document.getElementById("optionsGrid");
+      const form = document.getElementById("formArea");
+      grid.classList.add("hidden");
+      form.classList.remove("hidden");
+
+      const sel        = answers.brandAvailability || [];
+      const needsLogo  = sel.includes("I have a logo");
+      const needsColor = sel.includes("I have brand colors");
+
+      if (!answers.logoStatus) answers.logoStatus = needsLogo ? "" : "No logo available";
+      if (!answers.colors)     answers.colors     = ["#0b7ff3","#12a8ff","#061b5b","#0b4fd8","#f0f8ff"];
+
+      const colorNames = [
+        translations[currentLang].color1, translations[currentLang].color2,
+        translations[currentLang].color3, translations[currentLang].color4,
+        translations[currentLang].color5
+      ];
+
+      let html = "";
+
+      if (!needsLogo && !needsColor) {
+        html += `<div class="success-box" style="display:block;">${currentLang==="en" ? "You did not select ready logo or brand colors — you can continue." : "لم تختر وجود لوجو أو ألوان جاهزة، لذلك يمكنك المتابعة."}</div>`;
+      }
+
+      if (needsLogo) {
+        html += `
+          <div class="field-group">
+            <label class="field-label">${translations[currentLang].uploadLogo} <span class="required-mark">*</span></label>
+            <div class="file-upload">
+              <div class="upload-row">
+                <div class="logo-preview" id="logoPreview">${logoDataUrl ? `<img src="${logoDataUrl}" alt="Logo" />` : translations[currentLang].noLogo}</div>
+                <div style="display:grid;gap:10px;flex:1;min-width:200px;">
+                  <input class="input" type="file" accept="image/*" onchange="handleLogoUpload(event)" />
+                  <input class="input" value="${answers.logoStatus||''}" placeholder="${currentLang==='en'?'Logo file name or note':'اسم ملف اللوجو أو ملاحظة'}" oninput="answers.logoStatus=this.value" />
+                </div>
+              </div>
+            </div>
+          </div>`;
+      }
+
+      if (needsColor) {
+        html += `
+          <div class="field-group">
+            <label class="field-label">${currentLang==="en"?"Brand colors palette":"لوحة ألوان الهوية"} <span class="required-mark">*</span></label>
+            <div class="color-grid">
+              ${answers.colors.map((c,i) => `
+                <div class="color-picker-card">
+                  <span class="color-name">${colorNames[i]}</span>
+                  <input type="color" value="${c}" onchange="updateColor(${i},this.value)" />
+                  <input class="input" value="${c}" oninput="updateColor(${i},this.value)" />
+                </div>`).join("")}
+            </div>
+          </div>`;
+      }
+
+      form.innerHTML = html;
+    }
+
+    function handleLogoUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      answers.logoStatus = file.name;
+      const r = new FileReader();
+      r.onload = e => { logoDataUrl = e.target.result; renderAssetsQ(); };
+      r.readAsDataURL(file);
+    }
+
+    function updateColor(i, val) {
+      if (!answers.colors) answers.colors = ["#0b7ff3","#12a8ff","#061b5b","#0b4fd8","#f0f8ff"];
+      answers.colors[i] = val || "#000000";
+      renderAssetsQ();
+    }
+
+    function selectOption(q, opt) {
+      if (q.type === "single") {
+        answers[q.id] = opt.en;
+      } else {
+        if (!Array.isArray(answers[q.id])) answers[q.id] = [];
+        const idx = answers[q.id].indexOf(opt.en);
+        answers[q.id] = idx > -1
+          ? answers[q.id].filter(x => x !== opt.en)
+          : [...answers[q.id], opt.en];
+      }
+      clearError();
+      renderQuestion();
+    }
+
+    /* ─── VALIDATION ─── */
+    function validateStep() {
+      const q = questions[currentStep];
+      if (!q.required && q.type !== "assets") return true;
+
+      if (q.type === "single" && !answers[q.id]) { showError(translations[currentLang].errorRequired); return false; }
+      if (q.type === "multiple" && (!Array.isArray(answers[q.id]) || !answers[q.id].length)) { showError(translations[currentLang].errorRequired); return false; }
+      if (q.hasOther && answers[q.id] === "Other" && !String(answers[q.id+"Other"]||"").trim()) { showError(translations[currentLang].errorForm); return false; }
+      if (q.type === "form") {
+        const bad = q.fields.some(f => f.required && !String(answers[f.id]||"").trim());
+        if (bad) { showError(translations[currentLang].errorForm); return false; }
+      }
+      if (q.type === "assets") {
+        const sel = answers.brandAvailability || [];
+        const ok = (!sel.includes("I have a logo") || String(answers.logoStatus||"").trim()) &&
+                   (!sel.includes("I have brand colors") || (Array.isArray(answers.colors) && answers.colors.every(c => /^#[0-9A-Fa-f]{6}$/.test(c))));
+        if (!ok) { showError(translations[currentLang].errorForm); return false; }
+      }
+      return true;
+    }
+
+    function nextStep() {
+      if (!validateStep()) return;
+      if (currentStep < questions.length - 1) { currentStep++; renderQuestion(); }
+      else { renderResult(); showScreen("resultScreen"); }
+    }
+
+    function prevStep() {
+      if (currentStep > 0) { currentStep--; renderQuestion(); }
+    }
+
+    function showError(msg)  { const e = document.getElementById("errorBox"); e.textContent = msg; e.style.display = "block"; }
+    function clearError()    { const e = document.getElementById("errorBox"); e.textContent = ""; e.style.display = "none"; }
+
+    /* ─── RESULT ─── */
+    function getVal(id) {
+      const v = answers[id];
+      if (!v || v.length === 0) return translations[currentLang].noAnswer;
+      return Array.isArray(v) ? v.join(", ") : v;
+    }
+
+    function getSummaryItems() {
+      return [
+        { en:"Service Type",             ar:"نوع الخدمة",              v: getVal("serviceType") },
+        { en:"Project Goal",             ar:"هدف المشروع",             v: getVal("projectGoal") },
+        { en:"Business Field",           ar:"مجال النشاط",             v: getVal("businessField") },
+        { en:"Other Business Field",     ar:"توضيح المجال الآخر",      v: getVal("businessFieldOther") },
+        { en:"Style Direction",          ar:"اتجاه الستايل",           v: getVal("style") },
+        { en:"Reference Link 1",         ar:"رابط مرجعي ١",            v: getVal("reference1") },
+        { en:"Reference Link 2",         ar:"رابط مرجعي ٢",            v: getVal("reference2") },
+        { en:"Reference Notes",          ar:"ملاحظات المراجع",         v: getVal("referenceNotes") },
+        { en:"Features / Deliverables",  ar:"الخصائص / المخرجات",     v: getVal("features") },
+        { en:"Brand Asset Availability", ar:"توفر ملفات الهوية",       v: getVal("brandAvailability") },
+        { en:"Logo File / Status",       ar:"ملف / حالة اللوجو",       v: getVal("logoStatus") },
+        { en:"Brand Colors",             ar:"ألوان الهوية",             v: getVal("colors") },
+        { en:"Prepared Assets",          ar:"الملفات الجاهزة",          v: getVal("preparedAssets") },
+        { en:"Preferred Contact Method", ar:"طريقة التواصل المفضلة",   v: getVal("contactPreference") },
+        { en:"Progress Review Frequency",ar:"معدل مراجعة العمل",       v: getVal("reviewFrequency") },
+        { en:"Timeline",                 ar:"المدة المفضلة",           v: getVal("timeline") },
+        { en:"Project Level",            ar:"مستوى المشروع",           v: getVal("budgetDirection") },
+        { en:"Client / Company",         ar:"العميل / الشركة",         v: getVal("clientName") },
+        { en:"Phone",                    ar:"رقم الهاتف",              v: getVal("phone") },
+        { en:"Email",                    ar:"البريد الإلكتروني",       v: getVal("email") },
+        { en:"Current Website / Page",   ar:"الموقع / الصفحة الحالية", v: getVal("currentWebsite") },
+        { en:"Extra Notes",              ar:"ملاحظات إضافية",           v: getVal("notes") }
+      ];
+    }
+
+    function appendSummarySection(lines, heading, rows) {
+      lines.push(heading);
+      rows.forEach(row => lines.push(`${row.label}: ${row.value}`));
+      lines.push("");
+    }
+
+    function getPlainSummary() {
+      const isEn = currentLang === "en";
+      const title = isEn ? "Easy App Project Brief Summary" : "ملخص استبيان مشروع Easy App";
+      const lines = [
+        title,
+        isEn ? `Submission Number: ${submittedCount + 1}` : `رقم الإرسال: ${submittedCount + 1}`,
+        isEn ? `Language: ${currentLang.toUpperCase()}` : `اللغة: ${currentLang.toUpperCase()}`,
+        isEn ? `Date: ${new Date().toLocaleString("en-US")}` : `التاريخ: ${new Date().toLocaleString("ar-EG")}`,
+        ""
+      ];
+
+      appendSummarySection(
+        lines,
+        isEn ? "PROJECT OVERVIEW" : "نظرة عامة على المشروع",
+        [
+          { label: isEn ? "Service Type" : "نوع الخدمة", value: getVal("serviceType") },
+          { label: isEn ? "Project Goal" : "هدف المشروع", value: getVal("projectGoal") },
+          { label: isEn ? "Business Field" : "مجال النشاط", value: getVal("businessField") },
+          { label: isEn ? "Other Business Field" : "توضيح المجال الآخر", value: getVal("businessFieldOther") },
+          { label: isEn ? "Style Direction" : "اتجاه الستايل", value: getVal("style") },
+          { label: isEn ? "Features / Deliverables" : "الخصائص / المخرجات", value: getVal("features") }
+        ]
+      );
+
+      appendSummarySection(
+        lines,
+        isEn ? "REFERENCES & BRAND ASSETS" : "المراجع وملفات الهوية",
+        [
+          { label: isEn ? "Reference Link 1" : "رابط مرجعي 1", value: getVal("reference1") },
+          { label: isEn ? "Reference Link 2" : "رابط مرجعي 2", value: getVal("reference2") },
+          { label: isEn ? "Reference Notes" : "ملاحظات المراجع", value: getVal("referenceNotes") },
+          { label: isEn ? "Brand Asset Availability" : "توفر ملفات الهوية", value: getVal("brandAvailability") },
+          { label: isEn ? "Logo File / Status" : "ملف / حالة اللوجو", value: getVal("logoStatus") },
+          { label: isEn ? "Brand Colors" : "ألوان الهوية", value: getVal("colors") },
+          { label: isEn ? "Prepared Assets" : "الملفات الجاهزة", value: getVal("preparedAssets") }
+        ]
+      );
+
+      appendSummarySection(
+        lines,
+        isEn ? "DELIVERY & COMMUNICATION" : "التسليم والتواصل",
+        [
+          { label: isEn ? "Preferred Contact Method" : "طريقة التواصل المفضلة", value: getVal("contactPreference") },
+          { label: isEn ? "Progress Review Frequency" : "معدل مراجعة العمل", value: getVal("reviewFrequency") },
+          { label: isEn ? "Timeline" : "المدة المفضلة", value: getVal("timeline") },
+          { label: isEn ? "Project Level" : "مستوى المشروع", value: getVal("budgetDirection") }
+        ]
+      );
+
+      appendSummarySection(
+        lines,
+        isEn ? "CLIENT DETAILS" : "بيانات العميل",
+        [
+          { label: isEn ? "Client / Company" : "العميل / الشركة", value: getVal("clientName") },
+          { label: isEn ? "Phone" : "رقم الهاتف", value: getVal("phone") },
+          { label: isEn ? "Email" : "البريد الإلكتروني", value: getVal("email") },
+          { label: isEn ? "Current Website / Page" : "الموقع / الصفحة الحالية", value: getVal("currentWebsite") },
+          { label: isEn ? "Extra Notes" : "ملاحظات إضافية", value: getVal("notes") }
+        ]
+      );
+
+      return lines.join("\n");
+    }
+
+    function renderResult() {
+      const grid = document.getElementById("summaryGrid");
+      grid.innerHTML = "";
+      getSummaryItems().forEach(item => {
+        const lbl      = currentLang === "en" ? item.en : item.ar;
+        const isColors = item.en === "Brand Colors";
+        const dots     = isColors && Array.isArray(answers.colors)
+          ? `<div class="color-summary">${answers.colors.map(c=>`<div class="color-dot" style="background:${c}" title="${c}"></div>`).join("")}</div>`
+          : "";
+        grid.innerHTML += `<div class="summary-item"><span>${lbl}</span><strong>${item.v}</strong>${dots}</div>`;
+      });
+    }
+
+    /* ─── SUBMIT ─── */
+    async function submitBrief() {
+      const btn    = document.getElementById("submitBtn");
+      const status = document.getElementById("submitStatus");
+      const errBox = document.getElementById("submitError");
+      const t      = translations[currentLang];
+
+      status.style.display = errBox.style.display = "none";
+
+      btn.disabled = true;
+      btn.innerHTML = t.submitting;
+
+      const directClientEmail = answers.email || "";
+      const directSubmissionDate = new Date().toLocaleString(currentLang === "en" ? "en-US" : "ar-EG");
+      const directPayload = {
+        clientName:         answers.clientName || "",
+        clientEmail:        directClientEmail,
+        phone:              answers.phone || "",
+        currentWebsite:     answers.currentWebsite || "",
+        notes:              answers.notes || "",
+        serviceType:        answers.serviceType || "",
+        submissionLanguage: currentLang.toUpperCase(),
+        submissionDate:     directSubmissionDate,
+        submissionVersion:  submittedCount + 1,
+        logoFileName:       answers.logoStatus || "",
+        summaryText:        getPlainSummary(),
+        summaryItems: getSummaryItems().map(item => ({
+          label: currentLang === "en" ? item.en : item.ar,
+          value: item.v
+        }))
+      };
+
+      try {
+        const directRes = await fetch(SUBMIT_ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Accept": "application/json" },
+          body: JSON.stringify(directPayload)
+        });
+        const directData = await directRes.json().catch(() => ({}));
+
+        if (!directRes.ok) {
+          errBox.textContent = directData.error || t.submitError;
+          errBox.style.display = "block";
+          return;
+        }
+
+        submittedCount++;
+        status.textContent   = directData.warning || t.submitSuccess;
+        status.style.display = "block";
+
+        const directEmailNote = document.getElementById("thanksEmailNote");
+        if (directEmailNote && directClientEmail) {
+          directEmailNote.querySelector("span").innerHTML =
+            directData.emailSent === false
+              ? (currentLang === "en"
+                  ? `Your brief was saved successfully. Configure the mail server to send the confirmation email to <strong>${directClientEmail}</strong>.`
+                  : `\u062a\u0645 \u062d\u0641\u0638 \u0627\u0644\u0627\u0633\u062a\u0628\u064a\u0627\u0646 \u0628\u0646\u062c\u0627\u062d. \u0642\u0645 \u0628\u0625\u0639\u062f\u0627\u062f \u062e\u0627\u062f\u0645 \u0627\u0644\u0628\u0631\u064a\u062f \u0644\u0625\u0631\u0633\u0627\u0644 \u0631\u0633\u0627\u0644\u0629 \u0627\u0644\u062a\u0623\u0643\u064a\u062f \u0625\u0644\u0649 <strong>${directClientEmail}</strong>.`)
+              : (currentLang === "en"
+                  ? `A detailed confirmation has been sent to <strong>${directClientEmail}</strong>. Our team will review your brief and contact you soon.`
+                  : `\u062a\u0645 \u0625\u0631\u0633\u0627\u0644 \u0631\u0633\u0627\u0644\u0629 \u062a\u0623\u0643\u064a\u062f \u0645\u0641\u0635\u0644\u0629 \u0625\u0644\u0649 <strong>${directClientEmail}</strong>. \u0633\u064a\u0642\u0648\u0645 \u0641\u0631\u064a\u0642\u0646\u0627 \u0628\u0645\u0631\u0627\u062c\u0639\u0629 \u0627\u0644\u0627\u0633\u062a\u0628\u064a\u0627\u0646 \u0648\u0627\u0644\u062a\u0648\u0627\u0635\u0644 \u0645\u0639\u0643 \u0642\u0631\u064a\u0628\u064b\u0627.`);
+        }
+
+        showScreen("thanksScreen");
+      } catch {
+        errBox.textContent   = t.submitError;
+        errBox.style.display = "block";
+      } finally {
+        btn.disabled  = false;
+        btn.innerHTML = t.submitBtn;
+      }
+      return;
+
+      if (!FORM_ENDPOINT || FORM_ENDPOINT.includes("YOUR_FORM")) {
+        errBox.textContent = currentLang === "en"
+          ? "Add your Formspree endpoint in FORM_ENDPOINT."
+          : "أضف رابط Formspree أولًا داخل FORM_ENDPOINT.";
+        errBox.style.display = "block";
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = t.submitting;
+
+      const clientEmail = answers.email || "";
+      const summaryText = getPlainSummary();
+      const serviceType = answers.serviceType || (currentLang === "en" ? "Project Brief" : "استبيان مشروع");
+      const submissionDate = new Date().toLocaleString(currentLang === "en" ? "en-US" : "ar-EG");
+
+      const payload = {
+        /* Formspree special fields */
+        _subject:    `Easy App Project Brief — ${answers.clientName || "New Client"} — v${submittedCount + 1}`,
+        _replyto:    clientEmail,   /* ← enables auto-reply in Formspree */
+
+        /* Data fields */
+        name:              answers.clientName || "",
+        email:             clientEmail,
+        phone:             answers.phone || "",
+        message:           getPlainSummary(),
+        logo_file_name:    answers.logoStatus || "",
+        submission_version: submittedCount + 1
+      };
+      payload._subject = `Easy App Brief | ${answers.clientName || "New Client"} | ${serviceType} | #${submittedCount + 1}`;
+      payload.service_type = answers.serviceType || "";
+      payload.submission_language = currentLang.toUpperCase();
+      payload.submission_date = submissionDate;
+      payload.message = summaryText;
+
+      try {
+        const res = await fetch(FORM_ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Accept": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) throw new Error("failed");
+
+        submittedCount++;
+        status.textContent   = t.submitSuccess;
+        status.style.display = "block";
+
+        // Show the client's email on thanks screen
+        const emailNote = document.getElementById("thanksEmailNote");
+        if (emailNote && clientEmail) {
+          emailNote.querySelector("span").innerHTML =
+            (currentLang === "en"
+              ? `A confirmation email has been sent to <strong>${clientEmail}</strong>. We appreciate your time and will get back to you as soon as possible!`
+              : `تم إرسال بريد تأكيد إلى <strong>${clientEmail}</strong>. نقدر وقتك وسنتواصل معك في أقرب وقت!`);
+        }
+
+        if (emailNote && clientEmail) {
+          emailNote.querySelector("span").innerHTML =
+            currentLang === "en"
+              ? `A detailed confirmation has been sent to <strong>${clientEmail}</strong>. Our team will review your brief and contact you soon.`
+              : `\u062a\u0645 \u0625\u0631\u0633\u0627\u0644 \u0631\u0633\u0627\u0644\u0629 \u062a\u0623\u0643\u064a\u062f \u0645\u0641\u0635\u0644\u0629 \u0625\u0644\u0649 <strong>${clientEmail}</strong>. \u0633\u064a\u0642\u0648\u0645 \u0641\u0631\u064a\u0642\u0646\u0627 \u0628\u0645\u0631\u0627\u062c\u0639\u0629 \u0627\u0644\u0627\u0633\u062a\u0628\u064a\u0627\u0646 \u0648\u0627\u0644\u062a\u0648\u0627\u0635\u0644 \u0645\u0639\u0643 \u0642\u0631\u064a\u0628\u064b\u0627.`;
+        }
+        showScreen("thanksScreen");
+      } catch {
+        errBox.textContent   = t.submitError;
+        errBox.style.display = "block";
+      } finally {
+        btn.disabled  = false;
+        btn.innerHTML = t.submitBtn;
+      }
+    }
+
+    function printSummary() { window.print(); }
+
+    function editAnswers() {
+      currentStep = 0;
+      showScreen("quizScreen");
+      renderQuestion();
+    }
+
+    function restartQuiz() {
+      currentStep = 0; answers = {}; logoDataUrl = ""; submittedCount = 0;
+      showScreen("welcomeScreen");
+    }
+
+    /* ─── INIT ─── */
+    let initialLang = "en";
+    try {
+      const savedLang = localStorage.getItem(LANG_STORAGE_KEY);
+      if (savedLang === "en" || savedLang === "ar") initialLang = savedLang;
+    } catch {}
+    setLanguage(initialLang);
+  </script>
+</body>
+</html>
